@@ -1,0 +1,56 @@
+[data-product] input{
+    position: absolute;
+    left: 20px;
+    bottom: 10px;
+}
+[data-product] .name{
+    height: 40px;
+    line-height: 20px;
+    white-space: normal;
+    color: #666;
+}
+[data-product] .price{
+    color: #ff3300;
+}
+[data-product] .oldPrice{
+    font-size: 12px;
+    color: #ccc;
+    text-decoration: line-through;
+}
+[data-product] .size{
+    font-size: 12px;
+}
+[data-product] .number{
+    float: right;
+}
+.mui-table-view .mui-media-object {
+    max-width: 60px;
+    height: 60px;
+}
+
+.cart_order{
+    height: 30px;
+    line-height: 30px;
+    border-top: 1px solid #ccc;
+    position: fixed;
+    left: 0;
+    bottom: 50px;
+    background: #fff;
+    width: 100%;
+    z-index: 999;
+    padding-left: 20px;
+    font-size: 14px;
+    color: #ff3300;
+    font-weight: 600;
+}
+.cart_order a{
+    width: 100px;
+    text-align: center;
+    background: #ff3300;
+    display: block;
+    float: right;
+    color: #fff;
+}
+.mui-table-view{
+    padding-bottom:30px;
+}
