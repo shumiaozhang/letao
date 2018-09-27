@@ -28,7 +28,7 @@
                 <input name="pass" type="password" placeholder="密码" class="mui-input-password">
                 <span class="mui-icon mui-icon-eye"></span>
             </div>
-            <a href="index.html" class="mui-btn mui-btn-primary btn_login">登录</a>
+            <button class="mui-btn mui-btn-primary btn_login">登录</button>
             <div class="mui-input-row cz_text">
                 <a href="register.html">免费注册</a>
             </div>
@@ -42,5 +42,24 @@
     </footer>
 </div>
 <script src="../res/mui/js/mui.min.js"></script>
+<script src="../js/jquery.min.js"></script>
+<script>
+    $('.btn_login').on('click', function(){
+        $.ajax({
+            url: '/api/user/login',
+            type: 'post',
+            data: {
+                username: $('input[name="name"]').val(),
+                password: $('input[name="pass"]').val()
+            },
+            success: function (info) {
+
+                if(info.success) {
+                    location.href = './index.html';
+                }
+            }        
+        })
+    })
+</script>
 </body>
 </html>
