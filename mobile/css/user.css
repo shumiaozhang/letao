@@ -11,7 +11,7 @@ body{
     margin: 20px 0;
 }
 
-[type="text"][name="code"]{
+[type="text"][name="vCode"]{
     width: 60%;
     float: left;
 }

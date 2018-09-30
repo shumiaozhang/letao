@@ -44,6 +44,7 @@
 <script src="../res/mui/js/mui.min.js"></script>
 <script src="../js/jquery.min.js"></script>
 <script>
+    //登录页面 当用户输入信息后，获取数据后，发送请求，如果成功则跳转到index页面
     $('.btn_login').on('click', function(){
         $.ajax({
             url: '/api/user/login',

@@ -62,8 +62,9 @@
         url:'/api/user/queryUserMessage',
         type:'get',
         success: function(info){
-            console.log(info.username)
+            // console.log(info.username)
             $('#uname').text(info.username);
+            // 将用户的名字填写在页面
             if(info.error){
                 location.href = './login.html';
             }
