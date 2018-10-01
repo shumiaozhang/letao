@@ -23,58 +23,7 @@
     <div class="cz_container ">
         <div class="mui-scroll-wrapper">
             <div class="mui-scroll">
-                <div class="cz_banner mui-slider">
-                    <div class="mui-slider-group mui-slider-loop">
-                        <div class="mui-slider-item mui-slider-item-duplicate">
-                            <a href="#"><img src="images/product.jpg"></a>
-                        </div>
-                        <div class="mui-slider-item mui-active">
-                            <a href="#"><img src="images/product.jpg"></a>
-                        </div>
-                        <div class="mui-slider-item mui-active">
-                            <a href="#"><img src="images/product.jpg"></a>
-                        </div>
-                        <div class="mui-slider-item mui-slider-item-duplicate">
-                            <a href="#"><img src="images/product.jpg"></a>
-                        </div>
-                    </div>
-                    <div class="mui-slider-indicator">
-                        <div class="mui-indicator mui-active"></div>
-                        <div class="mui-indicator"></div>
-                    </div>
-                </div>
-                <div class="p_title">
-                    Nike耐克 男式 NIKE AIR MAX 1 PND QS复刻休闲鞋
-                </div>
-                <div class="p_price">
-                    <span class="fold"><span>5.9</span>折</span>
-                    价格：<strong class="present">¥
-                    712.00</strong>
-                    <del class="original">¥1199.0</del>
-                </div>
-                <div class="p_size">
-                    尺码：
-                    <span class="btn_size">38</span>
-                    <span class="btn_size">39</span>
-                    <span class="btn_size">40</span>
-                    <span class="btn_size">41</span>
-                    <span class="btn_size">43</span>
-                    <span class="btn_size">44</span>
-                    <span class="btn_size">45</span>
-                </div>
-                <div class="p_number">
-                    数量：
-                    <span class="jian">-</span><input type="tel"/><span class="jia">+</span>
-                    剩余：0 件
-                </div>
-                <div class="p_detail">
-                    <img data-lazyload="images/detail.jpg"  alt=""/>
-                    <img data-lazyload="images/detail.jpg"  alt=""/>
-                    <img data-lazyload="images/detail.jpg"  alt=""/>
-                    <img data-lazyload="images/detail.jpg"  alt=""/>
-                    <img data-lazyload="images/detail.jpg"  alt=""/>
-                    <img data-lazyload="images/detail.jpg"  alt=""/>
-                </div>
+              
             </div>
         </div>
     </div>
@@ -84,10 +33,83 @@
     <a href="#" class="btn_addCart">加入购物车</a>
     <a href="#" class="btn_pay">立即购买</a>
 </div>
+    <script type="text/html" id="tpl">
+        <div class="cz_banner mui-slider">
+                <div class="mui-slider-group mui-slider-loop">
+                    <div class="mui-slider-item mui-slider-item-duplicate">
+                        <a href="#"><img src="images/product.jpg"></a>
+                    </div>
+                    <div class="mui-slider-item mui-active">
+                        <a href="#"><img src="images/product.jpg"></a>
+                    </div>
+                    <div class="mui-slider-item mui-active">
+                        <a href="#"><img src="images/product.jpg"></a>
+                    </div>
+                    <div class="mui-slider-item mui-slider-item-duplicate">
+                        <a href="#"><img src="images/product.jpg"></a>
+                    </div>
+                </div>
+                <div class="mui-slider-indicator">
+                    <div class="mui-indicator mui-active"></div>
+                    <div class="mui-indicator"></div>
+                </div>
+            </div>
+            <div class="p_title">
+                Nike耐克 男式 NIKE AIR MAX 1 PND QS复刻休闲鞋
+            </div>
+            <div class="p_price">
+                <span class="fold"><span>5.9</span>折</span>
+                价格：<strong class="present">¥
+                712.00</strong>
+                <del class="original">¥1199.0</del>
+            </div>
+            <div class="p_size">
+                尺码：
+                <span class="btn_size">38</span>
+                <span class="btn_size">39</span>
+                <span class="btn_size">40</span>
+                <span class="btn_size">41</span>
+                <span class="btn_size">43</span>
+                <span class="btn_size">44</span>
+                <span class="btn_size">45</span>
+            </div>
+            <div class="p_number">
+                数量：
+                <span class="jian">-</span><input type="tel"/><span class="jia">+</span>
+                剩余：0 件
+            </div>
+            <div class="p_detail">
+                <img data-lazyload="images/detail.jpg"  alt=""/>
+                <img data-lazyload="images/detail.jpg"  alt=""/>
+                <img data-lazyload="images/detail.jpg"  alt=""/>
+                <img data-lazyload="images/detail.jpg"  alt=""/>
+                <img data-lazyload="images/detail.jpg"  alt=""/>
+                <img data-lazyload="images/detail.jpg"  alt=""/>
+            </div>
+    </script>
 <script src="res/mui/js/mui.min.js"></script>
 <script src="res/mui/js/mui.lazyload.js"></script>
 <script src="res/mui/js/mui.lazyload.img.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/template-web.js"></script>
 <script>
+    // console.log(location)
+    var pid = location.search.slice(1);
+    var id = pid.slice(5)
+    console.log(pid)
+    // console.log(pid)
+
+    // 发送ajax请求商品祥页内容，加载出来，参数为id， 利用location 求取
+    $.ajax({
+        url: '/api/product/queryProductDetail',
+        type: 'get',
+        data: {id: id},
+        success: function(info){
+            console.log(info);
+        }
+    })
+
+
     mui(function(){
         mui('.mui-slider').slider({
             interval:3000 //自动轮播周期，若为0则不自动播放，默认为0；
@@ -101,21 +123,7 @@
             deceleration:0.0006, //阻尼系数,系数越小滑动越灵敏
             bounce: true, //是否启用回弹
         });
-        mui.init({
-            pullRefresh: {
-                container: '.mui-scroll-wrapper',
-                down: {
-                    callback: function(){
-                        setTimeout(function(){
-                            mui('.mui-scroll-wrapper').pullRefresh().endPulldownToRefresh(); //refresh completed
-                        },1000);
-                    }
-                }
-            }
-        });
-        mui('.p_detail').imageLazyload({
-            placeholder: '../images/user.jpg'
-        });
+      
     });
 </script>
 

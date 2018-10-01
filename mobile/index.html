@@ -99,42 +99,12 @@
             </div>
             <div class="cz_live">
                 <img src="images/title1.png" alt=""/>
-                <div class="mui-clearfix">
-                    <a href="#" class="cz_product">
-                        <div class="box">
-                            <img src="images/product.jpg" alt=""/>
-                            <p class="name">adidas阿迪达斯 男式 场下休闲篮球鞋S83700 </p>
-                            <p><span class="price">&yen;560.00</span><span class="oldPrice">&yen;888.00</span></p>
-                            <button class="button">立即购买</button>
-                        </div>
-                    </a>
-                    <a href="#" class="cz_product">
-                        <div class="box">
-                            <img src="images/product.jpg" alt=""/>
-                            <p class="name">adidas阿迪达斯 男式 场下休闲篮球鞋S83700 </p>
-                            <p><span class="price">&yen;560.00</span><span class="oldPrice">&yen;888.00</span></p>
-                            <button class="button">立即购买</button>
-                        </div>
-                    </a>
-                    <a href="#" class="cz_product">
-                        <div class="box">
-                            <img src="images/product.jpg" alt=""/>
-                            <p class="name">adidas阿迪达斯 男式 场下休闲篮球鞋S83700 </p>
-                            <p><span class="price">&yen;560.00</span><span class="oldPrice">&yen;888.00</span></p>
-                            <button class="button">立即购买</button>
-                        </div>
-                    </a>
-                    <a href="#" class="cz_product">
-                        <div class="box">
-                            <img src="images/product.jpg" alt=""/>
-                            <p class="name">adidas阿迪达斯 男式 场下休闲篮球鞋S83700 </p>
-                            <p><span class="price">&yen;560.00</span><span class="oldPrice">&yen;888.00</span></p>
-                            <button class="button">立即购买</button>
-                        </div>
-                    </a>
+                <div class="mui-clearfix" id="list">
+                  
+                   
                 </div>
             </div>
-            <div class="cz_live">
+            <!-- <div class="cz_live">
                 <img src="images/title2.png" alt=""/>
                 <div class="mui-clearfix">
                     <a href="#" class="cz_product">
@@ -174,7 +144,7 @@
             <div class="cz_live">
                 <img src="images/title3.png" alt=""/>
                 <div class="mui-clearfix">
-                    <a href="#" class="cz_product">
+                    <a href="./product.html" class="cz_product">
                         <div class="box">
                             <img src="images/product.jpg" alt=""/>
                             <p class="name">adidas阿迪达斯 男式 场下休闲篮球鞋S83700 </p>
@@ -207,7 +177,7 @@
                         </div>
                     </a>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
     <footer class="cz_tabs">
@@ -217,24 +187,59 @@
         <a class="tab_user fa fa-user" href="user/index.html"><span>会员中心</span></a>
     </footer>
 </div>
+    <script type="text/html" id="tpl">
+        {{each data as val}}
+        <a href="./product.html?pid={{val.id}}" class="cz_product">
+            <div class="box">
+                <img src="/api{{val.pic[0].picAddr}}" alt=""/>
+                <p class="name">{{val.proName}}</p>
+                <p><span class="price">&yen;{{val.price}}</span><span class="oldPrice">&yen;{{val.oldPrice}}</span></p>
+                <button class="button">立即购买</button>
+            </div>
+        </a>
+        {{/each}}
+    </script>
+
+
+
 <script src="res/mui/js/mui.min.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="./js/template-web.js"></script>
 <script>
-    var xhr = new XMLHttpRequest();
-    xhr.open('get', '/api');
-    xhr.send();
+    // 进入页面发送ajax请求获取商品
+    $.ajax({
+        url: '/api/product/queryProduct',
+        type: 'get',
+        data: {
+            page: 1,
+            pageSize: 6
+        },
+        success:function(info){
+            console.log(info);
+            if(info.data.length>0){
+                //调用模板引擎
+                var html = template('tpl', info)
+                $('#list').html(html);
+                // 当调用成功后在使用插件
+                mui('.mui-scroll-wrapper').scroll({
+                    scrollY: true, //是否竖向滚动
+                    scrollX: false, //是否横向滚动
+                    startX: 0, //初始化时滚动至x
+                    startY: 0, //初始化时滚动至y
+                    indicators: false, //是否显示滚动条
+                    deceleration:0.0006, //阻尼系数,系数越小滑动越灵敏
+                    bounce: true, //是否启用回弹
+                });
+
+            }
+        }   
+        
+    })
     mui(function(){
         mui('.mui-slider').slider({
             interval:3000 //自动轮播周期，若为0则不自动播放，默认为0；
         });
-        mui('.mui-scroll-wrapper').scroll({
-            scrollY: true, //是否竖向滚动
-            scrollX: false, //是否横向滚动
-            startX: 0, //初始化时滚动至x
-            startY: 0, //初始化时滚动至y
-            indicators: false, //是否显示滚动条
-            deceleration:0.0006, //阻尼系数,系数越小滑动越灵敏
-            bounce: true, //是否启用回弹
-        });
+       
     });
 </script>
 </body>
