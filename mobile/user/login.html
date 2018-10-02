@@ -44,6 +44,20 @@
 <script src="../res/mui/js/mui.min.js"></script>
 <script src="../js/jquery.min.js"></script>
 <script>
+    
+    console.log(location)
+
+    var search = location.search.slice(1);
+        // 正则表达式
+    var reg = /url=(.+)/;
+
+    var match = reg.exec(search);
+
+    // console.log(match)
+        
+    // 获取地址的 url 参数值
+    var url = match && match[1];
+    // console.log(search)
     //登录页面 当用户输入信息后，获取数据后，发送请求，如果成功则跳转到index页面
     $('.btn_login').on('click', function(){
         $.ajax({
@@ -56,7 +70,12 @@
             success: function (info) {
 
                 if(info.success) {
-                    location.href = './index.html';
+                    // 有参数就返回购物车，没参数就跳转到用户首页
+                    if(url){
+                        location.href = url;
+                    }else{
+                        location.href = './index.html';
+                    }
                 }
             }        
         })

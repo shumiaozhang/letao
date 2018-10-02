@@ -22,7 +22,7 @@
     </header>
     <div class="cz_container ">
         <div class="mui-scroll-wrapper">
-            <div class="mui-scroll">
+            <div class="mui-scroll" id="xiang">
               
             </div>
         </div>
@@ -33,6 +33,7 @@
     <a href="#" class="btn_addCart">加入购物车</a>
     <a href="#" class="btn_pay">立即购买</a>
 </div>
+
     <script type="text/html" id="tpl">
         <div class="cz_banner mui-slider">
                 <div class="mui-slider-group mui-slider-loop">
@@ -55,13 +56,13 @@
                 </div>
             </div>
             <div class="p_title">
-                Nike耐克 男式 NIKE AIR MAX 1 PND QS复刻休闲鞋
+                {{proName}}
             </div>
             <div class="p_price">
-                <span class="fold"><span>5.9</span>折</span>
-                价格：<strong class="present">¥
-                712.00</strong>
-                <del class="original">¥1199.0</del>
+                <span class="fold"><span>{{discount}}</span>折</span>
+                价格：<strong class="present">￥{{price}}
+                </strong>
+                <del class="original">￥{{oldPrice}}/del>
             </div>
             <div class="p_size">
                 尺码：
@@ -88,43 +89,74 @@
             </div>
     </script>
 <script src="res/mui/js/mui.min.js"></script>
-<script src="res/mui/js/mui.lazyload.js"></script>
-<script src="res/mui/js/mui.lazyload.img.js"></script>
 <script src="js/jquery.min.js"></script>
 <script src="js/template-web.js"></script>
 <script>
     // console.log(location)
-    var pid = location.search.slice(1);
-    var id = pid.slice(5)
-    console.log(pid)
-    // console.log(pid)
+    var search = location.search.slice(1);
+    // 手动拆分
+    var arr = search.split('&');
+    // console.log(arr)
+    var qs={};
+    for(var i = 0; i < arr.length; i++){
+        // console.log(arr[i])
+        var tmp = arr[i].split('=');
+        // console.log(tmp)
+        qs[tmp[0]]= tmp[1];
+        // console.log(qs.pid)
+    }
 
-    // 发送ajax请求商品祥页内容，加载出来，参数为id， 利用location 求取
+    // 1 发送ajax请求商品祥页内容，加载出来，参数为id， 利用location 求取
     $.ajax({
         url: '/api/product/queryProductDetail',
         type: 'get',
-        data: {id: id},
+        // 2 参数为对象
+        data: {id: qs.pid},
         success: function(info){
-            console.log(info);
+            // console.log(info)
+            // 处理数据，打折的
+            info.discount = (info.price / info.oldPrice * 10).toFixed(1);
+            // 渲染模板
+            var html = template('tpl', info)
+            $('#xiang').html(html);
+            // 等加载完再插件
+            mui('.mui-slider').slider({
+                interval:3000 //自动轮播周期，若为0则不自动播放，默认为0；
+            });
+            mui('.mui-scroll-wrapper').scroll({
+                scrollY: true, //是否竖向滚动
+                scrollX: false, //是否横向滚动
+                startX: 0, //初始化时滚动至x
+                startY: 0, //初始化时滚动至y
+                indicators: false, //是否显示滚动条
+                deceleration:0.0006, //阻尼系数,系数越小滑动越灵敏
+                bounce: true, //是否启用回弹
+            });
         }
     })
-
-
-    mui(function(){
-        mui('.mui-slider').slider({
-            interval:3000 //自动轮播周期，若为0则不自动播放，默认为0；
-        });
-        mui('.mui-scroll-wrapper').scroll({
-            scrollY: true, //是否竖向滚动
-            scrollX: false, //是否横向滚动
-            startX: 0, //初始化时滚动至x
-            startY: 0, //初始化时滚动至y
-            indicators: false, //是否显示滚动条
-            deceleration:0.0006, //阻尼系数,系数越小滑动越灵敏
-            bounce: true, //是否启用回弹
-        });
-      
+    //加入购物车
+    $('.btn_addCart').on('click', function(){
+        $.ajax({
+            url: '/api/cart/addCart',
+            type: 'post',
+            data: {
+                    productId: 1,
+                    num: 2,
+                    size: 30
+            },
+            success: function(info){
+                console.log(info)
+                if(info.error){
+                    alert('请先登录');
+                    //
+                    location.href = './user/login.html?url=' + location.href;
+                }else{
+                    location.href = './cart.html';
+                }
+            }
+        })
     });
+
 </script>
 
 </body>
