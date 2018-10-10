@@ -12,6 +12,12 @@
     <link rel="stylesheet" href="res/fontAwesome/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="css/common.css"/>
     <link rel="stylesheet" href="css/cart.css"/>
+    <style>
+        .cz_container {
+            padding-top: 0;
+            margin-top: 45px;
+        }
+    </style>
 </head>
 <body>
     <div class="cz_layout">
@@ -35,68 +41,118 @@
         </footer>
     </div>
     <script type="text/html" id="tpl">
+        {{each data as val}}
         <li data-product="" class="mui-table-view-cell">
                 <div class="mui-slider-right mui-disabled">
                     <a class="mui-btn mui-btn-blue">编辑</a>
                     <a class="mui-btn mui-btn-red">删除</a>
                 </div>
                 <a href="javascript:;" class="mui-navigate-right mui-slider-handle">
-                    <img class="mui-media-object mui-pull-left" src="/api{{}}">
+                    <img class="mui-media-object mui-pull-left" src="/api{{val.pic[0].picAddr}}">
                     <div class="mui-media-body">
-                        <p class="name">{{proName}}</p>
+                        <p class="name">{{val.proName}}</p>
                         <p class="info">
-                            <span class="price">&yen;{{price}}</span>
-                            <span class="oldPrice">&yen;{{oldPrice}}</span>
-                            <span class="number">x{{num}}</span>
+                            <span class="price">&yen;{{val.price}}</span>
+                            <span class="oldPrice">&yen;{{val.oldPrice}}</span>
+                            <span class="number">x{{val.num}}</span>
                         </p>
-                        <p><span class="size">鞋码：{{size}}</span></p>
+                        <p><span class="size">鞋码：{{val.size}}</span></p>
                     </div>
                     <input type="checkbox"/>
                 </a>
             </li>
+        {{/each}}
     </script>
     <script src="res/mui/js/mui.min.js"></script>
     <script src="./js/jquery.min.js"></script>
     <script src="./js/template-web.js"></script>
    
     <script>
+        var page = 1;
+        var pageSize = 3;
         $.ajax({
-            url: '/api/cart/queryCart',
+            url: '/api/cart/queryCartPaging',
             type: 'get',
+            data:{
+                page: page,
+                pageSize: pageSize
+            },
             success: function(info){
                 console.log(info);
-                console.log(info[0].price);
                 var html = template('tpl', info);
                 $('#product').html(html);
+                mui.init({
+                  pullRefresh : {
+                    container:".cz_container",//下拉刷新容器标识，querySelector能定位的css选择器均可，比如：id、.class等
+                    down : {
+                      height:50,//可选,默认50.触发下拉刷新拖动距离,
+                      auto: false,//可选,默认false.首次加载自动下拉刷新一次
+                      contentdown : "下拉可以刷新",//可选，在下拉可刷新状态时，下拉刷新控件上显示的标题内容
+                      contentover : "释放立即刷新",//可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+                      contentrefresh : "正在刷新...",//可选，正在刷新状态时，下拉刷新控件上显示的标题内容
+                      callback: function () {
+                        // console.log('加载更多数据');
+                        page = 1;
+
+                        $.ajax({
+                            url: '/api/cart/queryCartPaging',
+                            type: 'get',
+                            data: {
+                                page: page,
+                                pageSize: pageSize
+                            },
+                            success: function (info) {
+                                // 调用模板引擎
+                                var html = template('tpl', info);
+                                // 添加DOM
+                                $('#product').html(html);
+
+                                mui('.cz_container').pullRefresh().endPulldownToRefresh();
+                            }
+                        })
+                      } //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+                    },
+                    up : {
+                      height:50,//可选.默认50.触发上拉加载拖动距离
+                      auto:false,//可选,默认false.自动上拉加载一次
+                      contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+                      contentnomore:'没有更多数据了',//可选，请求完毕若没有更多数据时显示的提醒内容；
+                      callback: function () {
+                        mui('.cz_container').pullRefresh().refresh(true);
+                        // 请求新的数据
+                        $.ajax({
+                            url: '/api/cart/queryCartPaging',
+                            type: 'get',
+                            data: {
+                                page: ++page,
+                                pageSize: 3
+                            },
+                            success: function (info) {
+                                // 没有更多数据
+                                if(info.length == 0) {
+                                    mui('.cz_container').pullRefresh().endPullupToRefresh(true);
+
+                                    return;
+                                }
+                                
+                                // 调用模板引擎
+                                var html = template('tpl', info);
+                                // 添加DOM
+                                $('#product li').last().after(html);
+
+                                // 结束上拉加载
+                                mui('.cz_container').pullRefresh().endPullupToRefresh();
+                            }
+                        })
+                      } //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+                    }
+                  }
+                });
+                
             }
         })
 
-        mui(function(){
-            mui.init();
-            mui('.mui-table-view').on('tap','.mui-btn-red',function() {
-                var btnArray = ['是', '否'];
-                mui.confirm('你要删除这件商品吗？', '温馨提示', btnArray, function(e) {
-                    if (e.index == 0) {
-
-                    } else {
-
-                    }
-                })
-            });
-            mui('.mui-table-view').on('tap','.mui-btn-blue', function(e) {
-                e.detail.gesture.preventDefault(); //修复iOS 8.x平台存在的bug，使用plus.nativeUI.prompt会造成输入法闪一下又没了
-                var btnArray = ['确定', '取消'];
-                var template = '<input type="number" placeholder="选择数量"/><br>' +
-                        '<input type="text" placeholder="选择尺码" />';
-                mui.confirm(template, '编辑商品', btnArray, function(e) {
-                    if (e.index == 0) {
-
-                    } else {
-
-                    }
-                })
-            });
-            mui('.mui-scroll-wrapper').scroll({
+        mui('.mui-scroll-wrapper').scroll({
                 scrollY: true, //是否竖向滚动
                 scrollX: false, //是否横向滚动
                 startX: 0, //初始化时滚动至x
@@ -105,7 +161,6 @@
                 deceleration:0.0006, //阻尼系数,系数越小滑动越灵敏
                 bounce: true, //是否启用回弹
             });
-        });
     </script>
 </body>
 </html>

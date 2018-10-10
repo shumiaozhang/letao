@@ -12,6 +12,11 @@
     <link rel="stylesheet" href="res/fontAwesome/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="css/common.css"/>
     <link rel="stylesheet" href="css/product.css"/>
+    <style>
+        .btn_active{
+            background: pink;
+        }
+    </style>
 </head>
 <body>
 <div class="cz_layout">
@@ -66,18 +71,16 @@
             </div>
             <div class="p_size">
                 尺码：
-                <span class="btn_size">38</span>
-                <span class="btn_size">39</span>
-                <span class="btn_size">40</span>
-                <span class="btn_size">41</span>
-                <span class="btn_size">43</span>
-                <span class="btn_size">44</span>
-                <span class="btn_size">45</span>
+                {{each size as val}}
+                <span class="btn_size">{{val}}</span>
+                {{/each}}
             </div>
             <div class="p_number">
                 数量：
-                <span class="jian">-</span><input type="tel"/><span class="jia">+</span>
-                剩余：0 件
+                <span class="jian btn_num">-</span>
+                <input type="tel" class="input_num" value="1" />
+                <span class="jia btn_num">+</span>
+                剩余：<span class="p_num">{{num}}</span> 件
             </div>
             <div class="p_detail">
                 <img data-lazyload="images/detail.jpg"  alt=""/>
@@ -113,9 +116,11 @@
         // 2 参数为对象
         data: {id: qs.pid},
         success: function(info){
-            // console.log(info)
+            console.log(info)
             // 处理数据，打折的
             info.discount = (info.price / info.oldPrice * 10).toFixed(1);
+            // 将型号拆分成数组
+            info.size = info.size.split('-');
             // 渲染模板
             var html = template('tpl', info)
             $('#xiang').html(html);
@@ -134,25 +139,66 @@
             });
         }
     })
+
+    // 选中商品型号
+    $('#xiang').on('click', '.btn_size', function(){
+        $(this).addClass('btn_active').siblings().removeClass('btn_active')
+    })
+    // 选择数量
+    $('#xiang').on('click', '.btn_num', function(){
+        //商品数量表单元素
+        var input = $(this).siblings('input');
+        // 数值
+        var n = input.val() - 0;
+        if($(this).is('.jia')){
+            // 判断边界
+            if(n>= $('.p_num').text()) return mui.alert('数量不能超过库存')
+            return input.val(++n);
+        }
+        // 判断边界
+        if(n <= 1) return mui.alert('数量不能小于1');
+        return input.val(--n);
+    })
     //加入购物车
     $('.btn_addCart').on('click', function(){
+        // 1 获取参数 （DOM）
+        var num = $('.input_num').val() - 0;
+        var size = $('.btn_active').text();
+        // 验证数据
+        if(!size) return mui.alert('必须填选择一个型号');
+
+        if(num < 1) return mui.alert('必须选择数量');
+
+        if(num > $('.p_num').text()) return mui.alert('选择正确数量');
         $.ajax({
             url: '/api/cart/addCart',
             type: 'post',
             data: {
-                    productId: 1,
-                    num: 2,
-                    size: 30
+                    productId: qs.pid,
+                    num: num,
+                    size: size
             },
             success: function(info){
                 console.log(info)
                 if(info.error){
-                    alert('请先登录');
-                    //
-                    location.href = './user/login.html?url=' + location.href;
-                }else{
-                    location.href = './cart.html';
+                    mui.alert(
+                        '请先登录',
+                        '提示',
+                        '确定',
+                        function(){
+                            location.href = './user/login.html?url=' + location.href;
+                        }
+                    );
+                    return;
                 }
+                mui.alert(
+                    '添加购物车成功', 
+                    '提示',
+                    '确定',
+                    function(){
+                        location.href = './cart.html';
+                    }
+                )
             }
         })
     });
